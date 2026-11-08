@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>雅思备考 · 每日任务</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: #f5f5f7;
+  color: #1d1d1f;
+  min-height: 100vh;
+  padding-bottom: 40px;
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  transition: background-image 0.3s;
+}
+body::before {
+  content: '';
+  position: fixed;
+  top:0; left:0; right:0; bottom:0;
+  background: rgba(245,245,247,0.85);
+  z-index: -1;
+}
+.header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 24px 20px 30px;
+  border-radius: 0 0 24px 24px;
+  position: relative;
+}
+.header h1 { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+.stage-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.25);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.countdown {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1;
+}
+.countdown-label { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+.stats-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+.stat-card {
+  flex: 1;
+  background: rgba(255,255,255,0.15);
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+}
+.stat-num { font-size: 20px; font-weight: 700; }
+.stat-label { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+
+.bg-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.container { padding: 20px 16px; }
+
+.section-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 20px 0 12px;
+  color: #6e6e73;
+}
+
+/* 专注计时器 */
+.timer-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px 20px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  margin-bottom: 20px;
+}
+.timer-display {
+  font-size: 64px;
+  font-weight: 200;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  margin: 10px 0 20px;
+  color: #1d1d1f;
+}
+.timer-presets {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.preset-btn {
+  background: #f0f0f5;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #6e6e73;
+}
+.preset-btn.active { background: #667eea; color: white; }
+.timer-custom {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.timer-custom input {
+  width: 70px;
+  padding: 6px 8px;
+  border: 1px solid #d2d2d7;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 14px;
+}
+.timer-controls {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.timer-start {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 12px 36px;
+  border-radius: 24px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.timer-stop {
+  background: #ff3b30;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 24px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.task-list { display: flex; flex-direction: column; gap: 10px; }
+.task-item {
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  transition: all 0.2s;
+}
+.task-item.done { opacity: 0.55; }
+.task-item.done .task-name { text-decoration: line-through; }
+
+.checkbox {
+  width: 26px; height: 26px;
+  border: 2px solid #d2d2d7;
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.checkbox.checked {
+  background: #34c759;
+  border-color: #34c759;
+  color: white;
+}
+.checkbox.checked::after { content: "✓"; font-size: 14px; font-weight: 700; }
+
+.task-info { flex: 1; }
+.task-name { font-size: 15px; font-weight: 500; }
+.task-desc { font-size: 12px; color: #8e8e93; margin-top: 2px; }
+
+.progress-bar {
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+  margin-top: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+.progress-track {
+  height: 8px;
+  background: #e5e5ea;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+.reset-btn {
+  display: block;
+  margin: 30px auto 0;
+  background: none;
+  border: none;
+  color: #8e8e93;
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* 专注全屏 */
+.focus-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.92);
+  z-index: 1000;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+.focus-overlay.active { display: flex; }
+.focus-time {
+  font-size: 100px;
+  font-weight: 200;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  margin-bottom: 40px;
+}
+.focus-buttons { display: flex; gap: 16px; }
+.focus-btn {
+  padding: 12px 28px;
+  border-radius: 24px;
+  border: none;
+  font-size: 15px;
+  cursor: pointer;
+}
+.focus-btn.pause { background: #333; color: white; }
+.focus-btn.stop { background: #ff3b30; color: white; }
+
+.bg-input { display: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>雅思备考 · 每日任务</h1>
+  <div class="stage-badge" id="stageBadge">基础期</div>
+  <div class="countdown" id="examCountdown">--</div>
+  <div class="countdown-label" style="cursor:pointer; text-decoration:underline;" onclick="editExamDate()">
+    距离考试还有（天）· 点击修改
+  </div>
+  <input type="date" id="examDateInput" style="display:none;" onchange="saveExamDate(this.value)">
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num" id="streakDays">0</div>
+      <div class="stat-label">连续打卡</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="todayProgress">0/0</div>
+      <div class="stat-label">今日完成</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="totalDone">0</div>
+      <div class="stat-label">累计完成</div>
+    </div>
+  </div>
+  <button class="bg-btn" onclick="document.getElementById('bgInput').click()" title="更换背景">🖼</button>
+  <input type="file" id="bgInput" accept="image/*" onchange="changeBg(event)" style="display:none">
+</div>
+
+<div class="container">
+
+  <div class="section-title">专注计时</div>
+  <div class="timer-card">
+    <div class="timer-display" id="timerDisplay">25:00</div>
+    <div class="timer-presets">
+      <button class="preset-btn" onclick="setPreset(15)">15分钟</button>
+      <button class="preset-btn active" onclick="setPreset(25)">25分钟</button>
+      <button class="preset-btn" onclick="setPreset(45)">45分钟</button>
+      <button class="preset-btn" onclick="setPreset(60)">60分钟</button>
+    </div>
+    <div class="timer-custom">
+      <input type="number" id="customMin" min="1" max="180" placeholder="自定义">
+      <span style="font-size:13px;color:#8e8e93">分钟</span>
+      <button class="preset-btn" onclick="setCustom()">设置</button>
+    </div>
+    <div style="margin-bottom:16px; display:flex; gap:6px; justify-content:center; flex-wrap:wrap; align-items:center;">
+      <span style="font-size:12px;color:#8e8e93">提示音：</span>
+      <button class="preset-btn sound-btn active" onclick="setSound('ding', this)">叮</button>
+      <button class="preset-btn sound-btn" onclick="setSound('bell', this)">铃</button>
+      <button class="preset-btn sound-btn" onclick="setSound('chime', this)">风铃声</button>
+      <button class="preset-btn sound-btn" onclick="document.getElementById('soundInput').click()">📁 自定义</button>
+      <input type="file" id="soundInput" accept="audio/*" style="display:none" onchange="uploadSound(event)">
+    </div>
+    <div class="timer-controls">
+      <button class="timer-start" id="startBtn" onclick="toggleTimer()">开始</button>
+      <button class="timer-stop" onclick="resetTimer()">重置</button>
+    </div>
+  </div>
+
+  <div class="section-title">今日任务</div>
+  <div class="task-list" id="taskList"></div>
+
+  <div class="progress-bar">
+    <div class="progress-label">
+      <span>今日进度</span>
+      <span id="progressText">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+    </div>
+  </div>
+
+  <button class="reset-btn" onclick="finishDay()">结束今天 · 记录打卡</button>
+</div>
+
+<div class="focus-overlay" id="focusOverlay">
+  <div class="focus-time" id="focusTime">25:00</div>
+  <div class="focus-buttons">
+    <button class="focus-btn pause" id="pauseBtn" onclick="togglePause()">暂停</button>
+    <button class="focus-btn stop" onclick="exitFocus()">退出</button>
+  </div>
+</div>
+
+<script>
+// ===== 考试日期 =====
+function getExamDate() {
+  const saved = localStorage.getItem('ielts_examDate');
+  if (saved) return new Date(saved + 'T09:00:00+08:00');
+  return new Date('2027-04-15T09:00:00+08:00');
+}
+
+function editExamDate() {
+  const input = document.getElementById('examDateInput');
+  const saved = localStorage.getItem('ielts_examDate');
+  if (saved) input.value = saved;
+  input.click();
+}
+
+function saveExamDate(val) {
+  if (!val) return;
+  localStorage.setItem('ielts_examDate', val);
+  render();
+}
+const BASE_START = new Date('2026-11-10');
+const STRENGTHEN_START = new Date('2027-01-05');
+const SPRINT_START = new Date('2027-03-09');
+
+const TASKS = {
+  base: [
+    { name: '听力精听', desc: '剑桥G类Section 1，精听+跟读' },
+    { name: '阅读精读', desc: 'G类阅读文章，不掐时间精读' },
+    { name: '口语跟读', desc: 'Part 1话题，跟着录音读' },
+    { name: '背单词', desc: '雅思核心词，每天20个' },
+  ],
+  strengthen: [
+    { name: '听力套题', desc: 'G类1个Section，掐时间做' },
+    { name: '阅读套题', desc: 'G类1篇，掐时间做' },
+    { name: '写作练习', desc: '隔天写Task1书信/列提纲' },
+    { name: '口语Part2', desc: '1个话题卡，写要点+说2分钟' },
+  ],
+  sprint: [
+    { name: '半套题', desc: '听力+阅读各一部分，掐时间' },
+    { name: '错题复盘', desc: '分析错在哪，为什么错' },
+    { name: '口语Part3', desc: '拓展练习，观点+原因+例子' },
+  ],
+};
+
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function getStage() {
+  const now = new Date();
+  if (now < STRENGTHEN_START) return { key: 'base', label: '基础期' };
+  if (now < SPRINT_START) return { key: 'strengthen', label: '强化期' };
+  return { key: 'sprint', label: '冲刺期' };
+}
+
+function loadState() {
+  try {
+    return JSON.parse(localStorage.getItem('ielts_' + todayKey())) || { done: [], completed: false };
+  } catch { return { done: [], completed: false }; }
+}
+
+function saveState(s) {
+  localStorage.setItem('ielts_' + todayKey(), JSON.stringify(s));
+}
+
+function render() {
+  const stage = getStage();
+  const tasks = TASKS[stage.key];
+  const state = loadState();
+
+  document.getElementById('stageBadge').textContent = stage.label;
+
+  const diff = Math.ceil((getExamDate() - new Date()) / 86400000);
+  document.getElementById('examCountdown').textContent = diff > 0 ? diff : 0;
+
+  const list = document.getElementById('taskList');
+  list.innerHTML = '';
+  tasks.forEach((task, i) => {
+    const isDone = state.done.includes(i);
+    const item = document.createElement('div');
+    item.className = 'task-item' + (isDone ? ' done' : '');
+    item.innerHTML = `
+      <div class="checkbox ${isDone ? 'checked' : ''}" onclick="toggleTask(${i})"></div>
+      <div class="task-info">
+        <div class="task-name">${task.name}</div>
+        <div class="task-desc">${task.desc}</div>
+      </div>
+    `;
+    list.appendChild(item);
+  });
+
+  const doneCount = state.done.length;
+  const totalCount = tasks.length;
+  const pct = totalCount > 0 ? Math.round(doneCount / totalCount * 100) : 0;
+  document.getElementById('todayProgress').textContent = `${doneCount}/${totalCount}`;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = pct + '%';
+
+  document.getElementById('streakDays').textContent = localStorage.getItem('ielts_streak') || '0';
+  document.getElementById('totalDone').textContent = localStorage.getItem('ielts_total') || '0';
+}
+
+function toggleTask(i) {
+  const s = loadState();
+  if (s.done.includes(i)) s.done = s.done.filter(x => x !== i);
+  else s.done.push(i);
+  saveState(s);
+  render();
+}
+
+// ===== 计时器 =====
+let totalSec = 25 * 60;
+let remainSec = totalSec;
+let timerInt = null;
+let running = false;
+
+function setPreset(min) {
+  stopTimer();
+  totalSec = min * 60;
+  remainSec = totalSec;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  updateTimerDisplay();
+}
+
+function setCustom() {
+  const min = parseInt(document.getElementById('customMin').value);
+  if (!min || min < 1 || min > 180) return;
+  stopTimer();
+  totalSec = min * 60;
+  remainSec = totalSec;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(remainSec / 60);
+  const s = remainSec % 60;
+  const str = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  document.getElementById('timerDisplay').textContent = str;
+  document.getElementById('focusTime').textContent = str;
+}
+
+function toggleTimer() {
+  if (running) {
+    stopTimer();
+  } else {
+    startTimer();
+  }
+}
+
+function startTimer() {
+  running = true;
+  document.getElementById('startBtn').textContent = '暂停';
+  document.getElementById('focusOverlay').classList.add('active');
+  timerInt = setInterval(() => {
+    remainSec--;
+    if (remainSec <= 0) {
+      timerComplete();
+      return;
+    }
+    updateTimerDisplay();
+  }, 1000);
+}
+
+function stopTimer() {
+  running = false;
+  clearInterval(timerInt);
+  document.getElementById('startBtn').textContent = '开始';
+  document.getElementById('pauseBtn').textContent = '暂停';
+}
+
+function resetTimer() {
+  stopTimer();
+  remainSec = totalSec;
+  updateTimerDisplay();
+}
+
+function togglePause() {
+  if (running) {
+    stopTimer();
+    document.getElementById('pauseBtn').textContent = '继续';
+  } else {
+    running = true;
+    document.getElementById('pauseBtn').textContent = '暂停';
+    document.getElementById('startBtn').textContent = '暂停';
+    timerInt = setInterval(() => {
+      remainSec--;
+      if (remainSec <= 0) { timerComplete(); return; }
+      updateTimerDisplay();
+    }, 1000);
+  }
+}
+
+function exitFocus() {
+  document.getElementById('focusOverlay').classList.remove('active');
+}
+
+function timerComplete() {
+  stopTimer();
+  remainSec = totalSec;
+  updateTimerDisplay();
+  document.getElementById('focusOverlay').classList.remove('active');
+  playBell();
+  if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
+  alert('时间到！休息一下吧 ☕');
+}
+
+function playBell() {
+  const soundType = localStorage.getItem('ielts_sound') || 'ding';
+  const customAudio = localStorage.getItem('ielts_customSound');
+
+  if (customAudio) {
+    try {
+      const audio = new Audio(customAudio);
+      audio.play();
+      return;
+    } catch(e) {}
+  }
+
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const configs = {
+      ding: { freq: 880, type: 'sine', times: 3 },
+      bell: { freq: 660, type: 'triangle', times: 4 },
+      chime: { freq: 1200, type: 'sine', times: 5 },
+    };
+    const cfg = configs[soundType] || configs.ding;
+    for (let i = 0; i < cfg.times; i++) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = cfg.freq;
+      osc.type = cfg.type;
+      const start = ctx.currentTime + i * 0.35;
+      gain.gain.setValueAtTime(0.3, start);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.3);
+      osc.start(start);
+      osc.stop(start + 0.3);
+    }
+  } catch(e) {}
+}
+
+function setSound(type, btn) {
+  localStorage.setItem('ielts_sound', type);
+  localStorage.removeItem('ielts_customSound');
+  document.querySelectorAll('.sound-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // 试听一下
+  playBell();
+}
+
+function uploadSound(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    // 限制大小，避免localStorage爆掉
+    if (ev.target.result.length > 1000000) {
+      alert('音频文件太大了，请选1MB以内的');
+      return;
+    }
+    localStorage.setItem('ielts_customSound', ev.target.result);
+    localStorage.removeItem('ielts_sound');
+    document.querySelectorAll('.sound-btn').forEach(b => b.classList.remove('active'));
+    e.target.previousElementSibling.classList.add('active');
+    playBell();
+  };
+  reader.readAsDataURL(file);
+}
+
+// ===== 背景图 =====
+function changeBg(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    localStorage.setItem('ielts_bg', ev.target.result);
+    document.body.style.backgroundImage = `url(${ev.target.result})`;
+  };
+  reader.readAsDataURL(file);
+}
+
+// 加载保存的背景
+const savedBg = localStorage.getItem('ielts_bg');
+if (savedBg) document.body.style.backgroundImage = `url(${savedBg})`;
+
+// ===== 打卡 =====
+function finishDay() {
+  const s = loadState();
+  if (s.completed) return;
+  if (!confirm('确认今天任务全部完成，记录打卡？')) return;
+  s.completed = true;
+  saveState(s);
+
+  const today = todayKey();
+  const lastDate = localStorage.getItem('ielts_lastDate');
+  let streak = 1;
+  if (lastDate) {
+    const diff = (new Date(today) - new Date(lastDate)) / 86400000;
+    if (diff < 1.5) streak = parseInt(localStorage.getItem('ielts_streak') || '0') + 1;
+  }
+  localStorage.setItem('ielts_streak', streak);
+  localStorage.setItem('ielts_lastDate', today);
+  localStorage.setItem('ielts_total', (parseInt(localStorage.getItem('ielts_total')||'0') + s.done.length));
+
+  render();
+  alert(`打卡成功！连续${streak}天，今天完成${s.done.length}个任务。`);
+}
+
+// 初始化音效选择
+const savedSound = localStorage.getItem('ielts_sound');
+const hasCustom = localStorage.getItem('ielts_customSound');
+if (hasCustom) {
+  document.querySelectorAll('.sound-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.sound-btn:last-child').classList.add('active');
+} else if (savedSound) {
+  const btns = document.querySelectorAll('.sound-btn');
+  btns.forEach(b => b.classList.remove('active'));
+  if (savedSound === 'ding') btns[0].classList.add('active');
+  else if (savedSound === 'bell') btns[1].classList.add('active');
+  else if (savedSound === 'chime') btns[2].classList.add('active');
+}
+
+render();
+</script>
+</body>
+</html>
