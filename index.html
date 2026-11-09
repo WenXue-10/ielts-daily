@@ -25,9 +25,9 @@ body::before {
   z-index: -1;
 }
 .header {
-  background: linear-gradient(135deg, rgba(102,126,234,0.85) 0%, rgba(118,75,162,0.85) 100%);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: linear-gradient(135deg, rgba(102,126,234,0.6) 0%, rgba(118,75,162,0.6) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   color: white;
   padding: 24px 20px 30px;
   border-radius: 0 0 24px 24px;
@@ -275,7 +275,6 @@ body::before {
   <div class="countdown-label" style="cursor:pointer; text-decoration:underline;" onclick="editExamDate()">
     距离考试还有（天）· 点击修改
   </div>
-  <input type="date" id="examDateInput" style="display:none;" onchange="saveExamDate(this.value)">
   <div class="stats-row">
     <div class="stat-card">
       <div class="stat-num" id="streakDays">0</div>
@@ -357,14 +356,13 @@ function getExamDate() {
 }
 
 function editExamDate() {
-  const input = document.getElementById('examDateInput');
-  const saved = localStorage.getItem('ielts_examDate');
-  if (saved) input.value = saved;
-  input.click();
-}
-
-function saveExamDate(val) {
+  const current = localStorage.getItem('ielts_examDate') || '2027-04-15';
+  const val = prompt('请输入考试日期（格式：2027-04-15）：', current);
   if (!val) return;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+    alert('格式不对，请输入类似 2027-04-15 的格式');
+    return;
+  }
   localStorage.setItem('ielts_examDate', val);
   render();
 }
