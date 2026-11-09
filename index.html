@@ -301,10 +301,14 @@ body::before {
   <button class="bg-btn" onclick="document.getElementById('bgInput').click()" title="更换背景">🖼</button>
   <button class="bg-btn" style="right:64px;" onclick="toggleOpacityPanel()" title="调节透明度">⚙</button>
   <input type="file" id="bgInput" accept="image/*" onchange="changeBg(event)" style="display:none">
-  <div id="opacityPanel" style="display:none; position:absolute; top:64px; right:20px; background:rgba(255,255,255,0.9); backdrop-filter:blur(15px); border-radius:12px; padding:16px; width:220px; box-shadow:0 4px 20px rgba(0,0,0,0.15); z-index:100;">
-    <div style="font-size:13px; font-weight:600; margin-bottom:10px; color:#1d1d1f;">背景透明度调节</div>
+  <div id="opacityPanel" style="display:none; position:absolute; top:64px; right:20px; background:rgba(255,255,255,0.9); backdrop-filter:blur(15px); border-radius:12px; padding:16px; width:240px; box-shadow:0 4px 20px rgba(0,0,0,0.15); z-index:100;">
+    <div style="font-size:13px; font-weight:600; margin-bottom:10px; color:#1d1d1f;">外观调节</div>
+    <div style="font-size:12px; color:#6e6e73; margin-bottom:6px;">背景遮罩透明度</div>
     <input type="range" id="opacitySlider" min="0" max="100" value="30" style="width:100%;" oninput="changeOpacity(this.value)">
-    <div style="font-size:11px; color:#8e8e93; margin-top:6px;">数值越小背景越明显，越大越白</div>
+    <div style="font-size:11px; color:#8e8e93; margin:4px 0 12px;">越小背景越明显</div>
+    <div style="font-size:12px; color:#6e6e73; margin-bottom:6px;">毛玻璃模糊度</div>
+    <input type="range" id="blurSlider" min="0" max="30" value="15" style="width:100%;" oninput="changeBlur(this.value)">
+    <div style="font-size:11px; color:#8e8e93; margin-top:4px;">越大越模糊</div>
   </div>
 </div>
 
@@ -653,27 +657,47 @@ function toggleOpacityPanel() {
 
 function changeOpacity(val) {
   const opacity = val / 100;
-  document.body.style.setProperty('body::before', '');
-  // 直接改body的遮罩
-  const before = document.querySelector('body::before');
-  // 用CSS变量的方式
-  document.documentElement.style.setProperty('--overlay-opacity', opacity);
   localStorage.setItem('ielts_opacity', val);
+  // 更新遮罩
+  const oldStyle = document.getElementById('dynamicOpacityStyle');
+  if (oldStyle) oldStyle.remove();
+  const style = document.createElement('style');
+  style.id = 'dynamicOpacityStyle';
+  style.textContent = `body::before { background: rgba(255,255,255,${opacity}) !important; }`;
+  document.head.appendChild(style);
+}
+
+function changeBlur(val) {
+  const blur = val;
+  localStorage.setItem('ielts_blur', val);
+  // 更新所有卡片的模糊度
+  const oldStyle = document.getElementById('dynamicBlurStyle');
+  if (oldStyle) oldStyle.remove();
+  const style = document.createElement('style');
+  style.id = 'dynamicBlurStyle';
+  style.textContent = `
+    .stat-card, .timer-card, .task-item, .progress-bar, #opacityPanel, .bg-btn {
+      backdrop-filter: blur(${blur}px) !important;
+      -webkit-backdrop-filter: blur(${blur}px) !important;
+    }
+  `;
+  document.head.appendChild(style);
 }
 
 // 加载保存的背景
 const savedBg = localStorage.getItem('ielts_bg');
 if (savedBg) document.body.style.backgroundImage = `url(${savedBg})`;
 
-// 加载保存的透明度
+// 加载保存的设置
 const savedOpacity = localStorage.getItem('ielts_opacity');
 if (savedOpacity) {
   document.getElementById('opacitySlider').value = savedOpacity;
-  // 应用透明度
-  const opacity = savedOpacity / 100;
-  const style = document.createElement('style');
-  style.textContent = `body::before { background: rgba(255,255,255,${opacity}) !important; }`;
-  document.head.appendChild(style);
+  changeOpacity(savedOpacity);
+}
+const savedBlur = localStorage.getItem('ielts_blur');
+if (savedBlur) {
+  document.getElementById('blurSlider').value = savedBlur;
+  changeBlur(savedBlur);
 }
 
 // ===== 打卡 =====
