@@ -21,11 +21,13 @@ body::before {
   content: '';
   position: fixed;
   top:0; left:0; right:0; bottom:0;
-  background: rgba(245,245,247,0.85);
+  background: rgba(245,245,247,0.55);
   z-index: -1;
 }
 .header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, rgba(102,126,234,0.85) 0%, rgba(118,75,162,0.85) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   color: white;
   padding: 24px 20px 30px;
   border-radius: 0 0 24px 24px;
