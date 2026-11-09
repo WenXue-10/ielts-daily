@@ -21,33 +21,33 @@ body::before {
   content: '';
   position: fixed;
   top:0; left:0; right:0; bottom:0;
-  background: rgba(245,245,247,0.55);
+  background: rgba(255,255,255,0.3);
   z-index: -1;
+  transition: background 0.3s;
 }
 .header {
-  background: linear-gradient(135deg, rgba(102,126,234,0.6) 0%, rgba(118,75,162,0.6) 100%);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  color: white;
-  padding: 24px 20px 30px;
-  border-radius: 0 0 24px 24px;
+  background: transparent;
+  color: #1d1d1f;
+  padding: 24px 20px 20px;
   position: relative;
 }
 .header h1 { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
 .stage-badge {
   display: inline-block;
-  background: rgba(255,255,255,0.25);
+  background: rgba(102,126,234,0.2);
+  color: #5568d3;
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 13px;
   margin-bottom: 12px;
 }
 .countdown {
-  font-size: 36px;
+  font-size: 42px;
   font-weight: 700;
   line-height: 1;
+  color: #1d1d1f;
 }
-.countdown-label { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+.countdown-label { font-size: 13px; opacity: 0.7; margin-top: 4px; color: #1d1d1f; }
 .stats-row {
   display: flex;
   gap: 12px;
@@ -55,21 +55,24 @@ body::before {
 }
 .stat-card {
   flex: 1;
-  background: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 12px;
   padding: 10px;
   text-align: center;
 }
-.stat-num { font-size: 20px; font-weight: 700; }
-.stat-label { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+.stat-num { font-size: 20px; font-weight: 700; color: #1d1d1f; }
+.stat-label { font-size: 11px; opacity: 0.7; margin-top: 2px; color: #1d1d1f; }
 
 .bg-btn {
   position: absolute;
   top: 20px;
   right: 20px;
-  background: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.4);
+  backdrop-filter: blur(10px);
   border: none;
-  color: white;
+  color: #1d1d1f;
   width: 36px; height: 36px;
   border-radius: 50%;
   font-size: 18px;
@@ -87,7 +90,9 @@ body::before {
 
 /* 专注计时器 */
 .timer-card {
-  background: white;
+  background: rgba(255,255,255,0.4);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   border-radius: 16px;
   padding: 24px 20px;
   text-align: center;
@@ -161,7 +166,9 @@ body::before {
 
 .task-list { display: flex; flex-direction: column; gap: 10px; }
 .task-item {
-  background: white;
+  background: rgba(255,255,255,0.4);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   border-radius: 14px;
   padding: 16px;
   display: flex;
@@ -196,7 +203,9 @@ body::before {
 .task-desc { font-size: 12px; color: #8e8e93; margin-top: 2px; }
 
 .progress-bar {
-  background: white;
+  background: rgba(255,255,255,0.4);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   border-radius: 14px;
   padding: 16px;
   margin-top: 20px;
@@ -290,7 +299,13 @@ body::before {
     </div>
   </div>
   <button class="bg-btn" onclick="document.getElementById('bgInput').click()" title="更换背景">🖼</button>
+  <button class="bg-btn" style="right:64px;" onclick="toggleOpacityPanel()" title="调节透明度">⚙</button>
   <input type="file" id="bgInput" accept="image/*" onchange="changeBg(event)" style="display:none">
+  <div id="opacityPanel" style="display:none; position:absolute; top:64px; right:20px; background:rgba(255,255,255,0.9); backdrop-filter:blur(15px); border-radius:12px; padding:16px; width:220px; box-shadow:0 4px 20px rgba(0,0,0,0.15); z-index:100;">
+    <div style="font-size:13px; font-weight:600; margin-bottom:10px; color:#1d1d1f;">背景透明度调节</div>
+    <input type="range" id="opacitySlider" min="0" max="100" value="30" style="width:100%;" oninput="changeOpacity(this.value)">
+    <div style="font-size:11px; color:#8e8e93; margin-top:6px;">数值越小背景越明显，越大越白</div>
+  </div>
 </div>
 
 <div class="container">
@@ -631,9 +646,35 @@ function changeBg(e) {
   reader.readAsDataURL(file);
 }
 
+function toggleOpacityPanel() {
+  const panel = document.getElementById('opacityPanel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+function changeOpacity(val) {
+  const opacity = val / 100;
+  document.body.style.setProperty('body::before', '');
+  // 直接改body的遮罩
+  const before = document.querySelector('body::before');
+  // 用CSS变量的方式
+  document.documentElement.style.setProperty('--overlay-opacity', opacity);
+  localStorage.setItem('ielts_opacity', val);
+}
+
 // 加载保存的背景
 const savedBg = localStorage.getItem('ielts_bg');
 if (savedBg) document.body.style.backgroundImage = `url(${savedBg})`;
+
+// 加载保存的透明度
+const savedOpacity = localStorage.getItem('ielts_opacity');
+if (savedOpacity) {
+  document.getElementById('opacitySlider').value = savedOpacity;
+  // 应用透明度
+  const opacity = savedOpacity / 100;
+  const style = document.createElement('style');
+  style.textContent = `body::before { background: rgba(255,255,255,${opacity}) !important; }`;
+  document.head.appendChild(style);
+}
 
 // ===== 打卡 =====
 function finishDay() {
